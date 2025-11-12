@@ -67,4 +67,4 @@ const recipeSchema = new Schema(
 );
 
 export const Recipe = model('Recipe', recipeSchema);
-
+export const Ingredient = model('Ingredient', ingredientSchema);
