@@ -2,15 +2,11 @@ import { Schema, model } from 'mongoose';
 
 const ingredientSchema = new Schema(
   {
-    name: {
-      type: String,
-      trim: true,
-    },
     measure: {
       type: String,
       trim: true,
     },
-    ingredientId: {
+    id: {
       type: Schema.Types.ObjectId,
       ref: 'Ingredient',
     },
@@ -67,4 +63,3 @@ const recipeSchema = new Schema(
 );
 
 export const Recipe = model('Recipe', recipeSchema);
-export const Ingredient = model('Ingredient', ingredientSchema);

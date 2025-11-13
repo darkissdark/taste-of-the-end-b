@@ -9,14 +9,7 @@ const toNumberOrDefault = (value, defaultValue) => {
 };
 
 export const getRecipes = async (req, res) => {
-  const {
-    page = 1,
-    perPage = 12,
-    category,
-    area,
-    owner,
-    search,
-  } = req.query;
+  const { page = 1, perPage = 12, category, area, owner, search } = req.query;
 
   const pageNumber = toNumberOrDefault(page, 1);
   const perPageNumber = toNumberOrDefault(perPage, 12);
@@ -38,7 +31,11 @@ export const getRecipes = async (req, res) => {
   }
 
   const [recipes, total] = await Promise.all([
-    Recipe.find(filters).skip(skip).limit(perPageNumber),
+    Recipe.find(filters)
+      .skip(skip)
+      .limit(perPageNumber)
+      .populate('ingredients.id', 'name desc img'),
+
     Recipe.countDocuments(filters),
   ]);
 
@@ -70,4 +67,3 @@ export const getRecipeById = async (req, res, next) => {
 
   res.status(200).json(recipe);
 };
-
