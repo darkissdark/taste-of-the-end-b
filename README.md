@@ -82,7 +82,7 @@ get запит
 
 api/ingredients
 get запит
-повертає масив об'єктів інгрідієнтів
+повертає масив об'єктів інгрідієнтів відсортованих в алфавітному порядку
 [
 {
 "_id": "640c2dd963a319ea671e37aa",
@@ -97,3 +97,81 @@ get запит
 "img": "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e37f5.png"
 },
 ]
+підтримує пошук передавати параметр search (string)
+
+api/recipes
+get запит
+повертає масив рецептів з пагінацією
+"page": 1,
+"perPage": 12,
+"total": 285,
+"totalPages": 24,
+"recipes": [
+{
+"\_id": "6462a8f74c3d0ddd288980d1",
+"title": "Shakshuka",
+"category": "Vegetarian",
+"owner": "64c8d958249fae54bae90bb9",
+"area": "Egyptian",
+"instructions": "Heat the oil in a frying pan that has a lid, then soften the onions, chilli, garlic and coriander stalks for 5 mins until soft. Stir in the tomatoes and sugar, then bubble for 8-10 mins until thick. Can be frozen for 1 month.\r\n\r\nUsing the back of a large spoon, make 4 dips in the sauce, then crack an egg into each one. Put a lid on the pan, then cook over a low heat for 6-8 mins, until the eggs are done to your liking. Scatter with the coriander leaves and serve with crusty bread.",
+"description": "A popular Middle Eastern dish with eggs poached in a spicy tomato sauce, with onions, bell peppers, and spices. Serve with crusty bread for a hearty and delicious meal.",
+"thumb": "https://ftp.goit.study/img/so-yummy/preview/Shakshuka.jpg",
+"time": "25",
+"ingredients": [
+{
+"_id": "640c2dd963a319ea671e372c",
+"name": "Olive Oil",
+"desc": "A type of oil made from pressing whole olives, commonly used in cooking and as a salad dressing.",
+"img": "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e372c.png",
+"measure": "1 tbs"
+},
+{
+"_id": "640c2dd963a319ea671e374e",
+"name": "Red Onions",
+"desc": "A type of onion that has a deep purple skin and a mild, sweet flavor. They are often used in salads, sandwiches, and as a topping for pizza.",
+"img": "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e374e.png",
+"measure": "2 chopped"
+},
+],
+"createdAt": "2023-03-11T19:25:33.247Z",
+"updatedAt": "2023-05-28T00:29:28.560Z"
+},
+]
+підтримує пошук за категорією параметр 'category' валідні категорії тількі ті які існують у бд у випадку якщо передають невалідну категорію повертає 400 'invalid category'
+підтримує пошук за інгрідієнтом параметр 'ingredient' якщо нема рецептів з інгрідієнтом повертає пустий масив
+для реалізації пагінації використовувати параметри page perPage
+
+api/recipes/:recipeId
+get запит
+повертає об'єкт з рецептом
+{
+"\_id": "6462a8f74c3d0ddd288980d1",
+"title": "Shakshuka",
+"category": "Vegetarian",
+"owner": "64c8d958249fae54bae90bb9",
+"area": "Egyptian",
+"instructions": "Heat the oil in a frying pan that has a lid, then soften the onions, chilli, garlic and coriander stalks for 5 mins until soft. Stir in the tomatoes and sugar, then bubble for 8-10 mins until thick. Can be frozen for 1 month.\r\n\r\nUsing the back of a large spoon, make 4 dips in the sauce, then crack an egg into each one. Put a lid on the pan, then cook over a low heat for 6-8 mins, until the eggs are done to your liking. Scatter with the coriander leaves and serve with crusty bread.",
+"description": "A popular Middle Eastern dish with eggs poached in a spicy tomato sauce, with onions, bell peppers, and spices. Serve with crusty bread for a hearty and delicious meal.",
+"thumb": "https://ftp.goit.study/img/so-yummy/preview/Shakshuka.jpg",
+"time": "25",
+"ingredients": [
+{
+"name": "Olive Oil",
+"desc": "A type of oil made from pressing whole olives, commonly used in cooking and as a salad dressing.",
+"img": "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e372c.png",
+"measure": "1 tbs"
+},
+{
+"name": "Red Onions",
+"desc": "A type of onion that has a deep purple skin and a mild, sweet flavor. They are often used in salads, sandwiches, and as a topping for pizza.",
+"img": "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e374e.png",
+"measure": "2 chopped"
+},
+
+    ],
+    "createdAt": "2023-03-11T19:25:33.247Z",
+    "updatedAt": "2023-05-28T00:29:28.560Z"
+
+}
+у випадку передачі невалідного id повертає 400 і повідомлення "Invalid recipe id"
+якщо рецепт не знайдено у бд повертає 404 і повідомлення "Recipe not found"
