@@ -22,9 +22,13 @@ app.use(logger);
 app.use(express.json());
 app.use(cors({
   origin: [
-    "https://taste-of-the-end-f-4qj6.vercel.app"
+    'http://localhost:3001', // backend
+    'http://localhost:3000', // frontend
+    'https://taste-of-the-end-f-4qj6.vercel.app'
   ],
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
 app.use(cookieParser());
 
