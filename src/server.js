@@ -21,6 +21,8 @@ const app = express();
 const PORT = process.env.PORT ?? 3030;
 const allowedOrigins = getAllowedOrigins(isProd);
 
+app.set('trust proxy', 1);
+
 app.use(logger);
 app.use(express.json());
 app.use(
