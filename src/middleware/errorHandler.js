@@ -1,5 +1,6 @@
 import { HttpError } from 'http-errors';
 import { MulterError } from 'multer';
+import { isProd } from '../constants/env.js';
 
 export const errorHandler = (err, req, res, next) => {
   console.error('Error Middleware:', err);
@@ -20,8 +21,6 @@ export const errorHandler = (err, req, res, next) => {
       message: err.message,
     });
   }
-
-  const isProd = process.env.NODE_ENV === 'production';
 
   res.status(500).json({
     message: isProd

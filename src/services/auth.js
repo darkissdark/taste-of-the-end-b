@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/time.js';
 import { Session } from '../models/session.js';
+import { isProd } from '../constants/env.js';
 
 export const createSession = async (userId) => {
   const accessToken = crypto.randomBytes(30).toString('base64');
@@ -14,8 +15,6 @@ export const createSession = async (userId) => {
     refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
   });
 };
-
-const isProd = process.env.NODE_ENV === "production";
 
 const cookieOptions = {
     httpOnly: true,

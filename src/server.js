@@ -14,22 +14,23 @@ import userRoutes from './routes/userRoutes.js';
 import recipesRoutes from './routes/recipesRoutes.js';
 import categoriesRoutes from './routes/categoryRoutes.js';
 import ingredientsRoutes from './routes/ingredients.js';
+import { getAllowedOrigins } from './constants/origins.js';
+import { isProd } from './constants/env.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3030;
+const allowedOrigins = getAllowedOrigins(isProd);
 
 app.use(logger);
 app.use(express.json());
-app.use(cors({
-  origin: [
-    'http://localhost:3001', // backend
-    'http://localhost:3000', // frontend
-    'https://taste-of-the-end-f-4qj6.vercel.app'
-  ],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-}));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  }),
+);
 app.use(cookieParser());
 
 app.use(authRoutes);
