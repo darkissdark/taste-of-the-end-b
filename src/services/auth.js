@@ -15,10 +15,12 @@ export const createSession = async (userId) => {
   });
 };
 
+const isProd = process.env.NODE_ENV === "production";
+
 const cookieOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     path: '/',
   };
 
