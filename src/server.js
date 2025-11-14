@@ -20,7 +20,12 @@ const PORT = process.env.PORT ?? 3030;
 
 app.use(logger);
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://taste-of-the-end-f-4qj6.vercel.app"
+  ],
+  credentials: true
+}));
 app.use(cookieParser());
 
 app.use(authRoutes);
