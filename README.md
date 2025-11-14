@@ -1,99 +1,92 @@
-api/auth/register
-post запит передаєм
-{name:string до 16 символів,
-email: string схожий на email до 128символів,
-password: string від 8 до 128 символів,
-}
-у відповідь надходить статус 201 створюється сессія повертається об'єкт юзера, і кукі "accessToken", "refreshToken", "sessionId"
-{
-"email": "voronich97@gmail.ua",
-"avatar": "https://ac.goit.global/fullstack/react/default-avatar.jpg",
-"name": "yurii",
-"\_id": "691488706a6f522f4e30d509",
-"createdAt": "2025-11-12T13:15:28.821Z",
-"updatedAt": "2025-11-12T13:15:28.821Z"
-}
-якщо емейл використовується приходить статус 409 і повідомлення : "Email in use"
+# Taste of the End — Backend
 
-api/auth/login
-post запит передаєм
-{
-email: string схожий на email до 128символів,
-password: string від 8 до 128 символів,
-}
-у відповідь надходить статус 200 створюється сессія повертається об'єкт юзера, і кукі "accessToken", "refreshToken", "sessionId"
-{
-"email": "voronich97@gmail.ua",
-"avatar": "https://ac.goit.global/fullstack/react/default-avatar.jpg",
-"name": "yurii",
-"\_id": "691488706a6f522f4e30d509",
-"createdAt": "2025-11-12T13:15:28.821Z",
-"updatedAt": "2025-11-12T13:15:28.821Z"
-}
-якщо при логіні юзера не існує у бд або невірний пароль повертається 401 помлика
+REST API для застосунку з кулінарними рецептами. Підтримує реєстрацію, логін, керування сесіями, отримання профілю користувача, списків категорій та інгредієнтів, а також пошук рецептів.
 
-api/auth/logout приватний роут потребує передачі кукі
-post запит без тіла запиту
-у відповідь надходить статус 204 видаляється сессія і кукі "accessToken", "refreshToken", "sessionId"
-якщо при запиті не передати кукі буде помлика 401 missing "accessToken"
+## Стек
 
-api/auth/refresh роут для оновлення сесії потребує передачі кукі "refreshToken"
-post запит без тіла запиту
-у відповідь надходить статус 200 кукі "accessToken", "refreshToken", "sessionId" і повідомлення 'Session refreshed'
-якщо при запиті сесія не буде знайдена поверне 401 і повідомлення "session not found"
-якщо сплив термін життя рефреш токена поврне 401 і повідомлення "Session token expired"
+- Node.js 20+, Express 5
+- MongoDB + Mongoose
+- Celebrate/Joi для валідації
+- Cookie-based сесії (зберігаються у MongoDB)
 
-api/users/me приватний роут потребує передачі кукі
-get запит
-повертає об'єкт юзера
-{
-"email": "voronich97@gmail.ua",
-"avatar": "https://ac.goit.global/fullstack/react/default-avatar.jpg",
-"name": "yurii",
-"\_id": "691488706a6f522f4e30d509",
-"createdAt": "2025-11-12T13:15:28.821Z",
-"updatedAt": "2025-11-12T13:15:28.821Z"
-}
-якщо юзера не знайдено повертає 404 і повідомлення 'User not found'
-якщо не предати кукі поверне 401 missing "accessToken"
-якщо при запиті сесія не буде знайдена поверне 401 і повідомлення "session not found"
-якщо сплив термін життя рефреш токена поврне 401 і повідомлення "Session token expired"
+## Запуск
 
-api/categories
-get запит
-повертає масив категорій
-[
-"Seafood",
-"Lamb",
-"Starter",
-"Chicken",
-"Beef",
-"Dessert",
-"Vegan",
-"Pork",
-"Vegetarian",
-"Miscellaneous",
-"Pasta",
-"Breakfast",
-"Side",
-"Goat",
-"Soup"
-]
+1. Встановіть залежності:
+   ```bash
+   npm install
+   ```
+2. Створіть `.env` та додайте мінімум такі змінні:
+   ```env
+   MONGO_URL=mongodb+srv://...
+   NODE_ENV=development
+   PORT=3030
+   ```
+3. Запустіть сервер:
+   - розробка: `npm run dev`
+   - продакшн: `npm start`
 
-api/ingredients
-get запит
-повертає масив об'єктів інгрідієнтів
-[
-{
-"_id": "640c2dd963a319ea671e37aa",
-"name": "Squid",
-"desc": "A type of cephalopod with a soft, cylindrical body and long tentacles, often used in seafood dishes such as calamari or grilled squid.",
-"img": "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e37aa.png"
-},
-{
-"_id": "640c2dd963a319ea671e37f5",
-"name": "Cabbage",
-"desc": "A leafy green or purple vegetable that is often used in salads, coleslaw, and stir-fry dishes, and is also commonly fermented into sauerkraut.",
-"img": "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e37f5.png"
-},
-]
+Під час старту застосунок підʼєднується до MongoDB (`src/db/connectMongoDB.js`) і після успішного конекту слухає порт `PORT` (за замовчуванням 3030).
+
+## CORS та кукі
+
+- Список дозволених originʼів формується у `src/constants/origins.js`.
+- Кукі: `httpOnly`, `sameSite` = `none` у продакшні та `lax` у деві, `secure` = `true`, коли `NODE_ENV=production`.
+
+## Структура (скорочено)
+
+```
+src/
+├─ controllers/   // бізнес-логіка
+├─ routes/        // HTTP-маршрути
+├─ middleware/    // auth, логування, помилки
+├─ models/        // Mongoose-схеми
+├─ services/      // сесії тощо
+└─ utils/
+```
+
+## Базовий URL
+
+Усі ендпоінти доступні за префіксом `/api`.
+
+## API
+
+### Auth
+
+| Метод/Шлях                | Призначення                     | Тіло запиту                                      | Основні відповіді |
+| ------------------------- | ------------------------------- | ------------------------------------------------ | ----------------- |
+| `POST /api/auth/register` | Реєстрація + створення сесії    | `{ name (≤16), email (≤128), password (8-128) }` | `201`, `409`      |
+| `POST /api/auth/login`    | Логін, перевидача сесії         | `{ email, password }`                            | `200`, `401`      |
+| `POST /api/auth/logout`   | Видалення поточної сесії        | —                                                | `204`, `401`      |
+| `POST /api/auth/refresh`  | Оновлення access-токена за кукі | — (працює через `refreshToken` у кукі)           | `200`             |
+
+### Users
+
+| Метод/Шлях          | Опис                                |
+| ------------------- | ----------------------------------- |
+| `GET /api/users/me` | Повертає дані авторизованого юзера. |
+
+### Categories
+
+| Метод/Шлях            | Опис                                    |
+| --------------------- | --------------------------------------- |
+| `GET /api/categories` | Повертає масив назв категорій рецептів. |
+
+### Ingredients
+
+| Метод/Шлях             | Опис                                  |
+| ---------------------- | ------------------------------------- |
+| `GET /api/ingredients` | Повертає масив обʼєктів інгредієнтів. |
+
+### Recipes
+
+| Метод/Шлях                   | Опис                                                                                       | Параметри                                                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `GET /api/recipes`           | Пагінований список рецептів. Повертає `page`, `perPage`, `total`, `totalPages`, `recipes`. | Query: `page` (default 1), `perPage` (default 12), `category`, `area`, `owner` (ObjectId), `search` (регекс по `title`). |
+| `GET /api/recipes/:recipeId` | Деталі конкретного рецепта.                                                                | `400`, якщо id невалідний; `404`, якщо рецепт відсутній.                                                                 |
+
+## Ручні тести
+
+1. **Auth flow:** `register → login → refresh → logout` і перевірити кукі.
+2. **Захищені роути:** запит `GET /api/users/me` з валідними/простроченими кукі.
+3. **Категорії/інгредієнти:** переконатися у відповідності даних із БД.
+4. **Рецепти:** протестувати фільтри та пагінацію.

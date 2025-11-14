@@ -33,11 +33,11 @@ app.use(
 );
 app.use(cookieParser());
 
-app.use(authRoutes);
-app.use(userRoutes);
-app.use(recipesRoutes);
-app.use(categoriesRoutes);
-app.use(ingredientsRoutes);
+app.use('/api', authRoutes);
+app.use('/api', userRoutes);
+app.use('/api', recipesRoutes);
+app.use('/api', categoriesRoutes);
+app.use('/api', ingredientsRoutes);
 
 app.use(notFoundHandler);
 
