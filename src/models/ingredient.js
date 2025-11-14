@@ -12,9 +12,5 @@ const ingredientSchema = new Schema(
     versionKey: false,
   },
 );
-ingredientSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj._id;
-  return obj;
-};
+
 export const Ingredient = model('Ingredient', ingredientSchema);

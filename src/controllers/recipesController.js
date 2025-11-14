@@ -1,9 +1,12 @@
 import createHttpError from 'http-errors';
+import mongoose from 'mongoose';
+
 import { isValidObjectId } from 'mongoose';
 
 import { Recipe } from '../models/recipe.js';
 import { Ingredient } from '../models/ingredient.js';
 import { Category } from '../models/category.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
 const toNumberOrDefault = (value, defaultValue) => {
   const parsed = Number(value);
@@ -104,9 +107,9 @@ export const getRecipeById = async (req, res, next) => {
     return {
       ...obj,
       ingredients: obj.ingredients.map((i) => ({
-        name: i.id.name,
-        desc: i.id.desc,
-        img: i.id.img,
+        name: i.id?.name || null,
+        desc: i.id?.desc || null,
+        img: i.id?.img || null,
         measure: i.measure,
       })),
     };
@@ -115,4 +118,64 @@ export const getRecipeById = async (req, res, next) => {
   const formattedRecipe = formatRecipe(recipe);
 
   res.status(200).json(formattedRecipe);
+};
+
+export const createRecipe = async (req, res) => {
+  const { title, description, time, calories, instructions, category } =
+    req.body;
+  const { url } = await saveFileToCloudinary(req.file.buffer);
+
+  const categoryExists = await Category.exists({ name: category });
+  if (!categoryExists) {
+    return res.status(400).json({ message: 'Invalid category' });
+  }
+
+  let { ingredients } = req.body;
+
+  if (typeof ingredients === 'string') {
+    ingredients = JSON.parse(ingredients);
+  }
+
+  const { isValidObjectId } = mongoose;
+
+  // ...
+  let ingredientIds = ingredients.map((i) => i.id);
+
+  // Перевірка валідності ObjectId
+  const invalidIds = ingredientIds.filter((id) => !isValidObjectId(id));
+  if (invalidIds.length > 0) {
+    return res
+      .status(400)
+      .json({ message: 'One or more ingredient ids are invalid' });
+  }
+
+  // Тепер шукаємо в базі
+  const foundIngredients = await Ingredient.find({
+    _id: { $in: ingredientIds },
+  }).select('_id');
+
+  if (foundIngredients.length !== ingredientIds.length) {
+    return res
+      .status(400)
+      .json({ message: 'One or more ingredients do not exist' });
+  }
+  const recipe = await Recipe.create({
+    title,
+    description,
+    category,
+    time,
+    calories,
+    ingredients: ingredients.map((i) => ({
+      id: i.id,
+      measure: i.measure,
+    })),
+    instructions,
+    thumb: url,
+    owner: req.user._id,
+  });
+
+  res.status(201).json({
+    message: 'Recipe created successfully',
+    recipe,
+  });
 };
