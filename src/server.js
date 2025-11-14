@@ -49,4 +49,7 @@ await connectMongoDB();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(
+    isProd ? 'Running in production mode' : 'Running in development mode',
+  );
 });
