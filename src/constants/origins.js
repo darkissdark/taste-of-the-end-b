@@ -1,6 +1,7 @@
 export const PROD_ORIGINS = [
   'https://taste-of-the-end-f.onrender.com',
   'https://taste-of-the-end-f.vercel.app',
+  'https://taste-of-the-end-f-4qj6.vercel.app'
 ];
 export const DEV_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
 
