@@ -23,6 +23,12 @@ const userSchema = new Schema(
       trim: true,
       required: true,
     },
+    favorites: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Recipe',
+      },
+    ],
   },
   {
     timestamps: true,

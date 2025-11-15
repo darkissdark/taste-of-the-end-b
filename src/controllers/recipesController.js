@@ -7,6 +7,7 @@ import { Recipe } from '../models/recipe.js';
 import { Ingredient } from '../models/ingredient.js';
 import { Category } from '../models/category.js';
 import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { User } from '../models/user.js';
 
 const toNumberOrDefault = (value, defaultValue) => {
   const parsed = Number(value);
@@ -138,10 +139,8 @@ export const createRecipe = async (req, res) => {
 
   const { isValidObjectId } = mongoose;
 
-  // ...
   let ingredientIds = ingredients.map((i) => i.id);
 
-  // Перевірка валідності ObjectId
   const invalidIds = ingredientIds.filter((id) => !isValidObjectId(id));
   if (invalidIds.length > 0) {
     return res
@@ -149,7 +148,6 @@ export const createRecipe = async (req, res) => {
       .json({ message: 'One or more ingredient ids are invalid' });
   }
 
-  // Тепер шукаємо в базі
   const foundIngredients = await Ingredient.find({
     _id: { $in: ingredientIds },
   }).select('_id');
@@ -177,5 +175,91 @@ export const createRecipe = async (req, res) => {
   res.status(201).json({
     message: 'Recipe created successfully',
     recipe,
+  });
+};
+export const getPersonalRecipes = async (req, res) => {
+  const userId = req.user._id; // приходить з auth middleware
+
+  const recipes = await Recipe.find({ owner: userId }).populate(
+    'ingredients.id',
+    'name desc img',
+  );
+  res.status(200).json({
+    total: recipes.length,
+    recipes,
+  });
+};
+
+export const addToFavorites = async (req, res) => {
+  const { recipeId } = req.params;
+  const userId = req.user._id;
+
+  if (!isValidObjectId(recipeId)) {
+    throw createHttpError(400, 'Invalid recipe id');
+  }
+
+  const recipeExists = await Recipe.exists({ _id: recipeId });
+  if (!recipeExists) {
+    throw createHttpError(404, 'Recipe not found');
+  }
+
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { favorites: recipeId },
+  });
+
+  res.json({ message: 'Added to favorites' });
+};
+
+export const getFavorites = async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId).populate({
+    path: 'favorites',
+    populate: {
+      path: 'ingredients.id',
+      select: 'name desc img',
+    },
+  });
+
+  const favorites = user.favorites.map((recipe) => {
+    const obj = recipe.toObject();
+
+    return {
+      ...obj,
+      ingredients: obj.ingredients.map((i) => ({
+        name: i.id.name,
+        desc: i.id.desc,
+        img: i.id.img,
+        measure: i.measure,
+      })),
+    };
+  });
+
+  res.status(200).json(favorites);
+};
+
+export const removeFromFavorites = async (req, res, next) => {
+  const userId = req.user._id;
+  const { recipeId } = req.params;
+
+  if (!isValidObjectId(recipeId)) {
+    return next(createHttpError(400, 'Invalid recipe id'));
+  }
+
+  const exists = await Recipe.exists({ _id: recipeId });
+  if (!exists) {
+    return next(createHttpError(404, 'Recipe not found'));
+  }
+
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      $pull: { favorites: recipeId },
+    },
+    { new: true },
+  );
+
+  res.status(200).json({
+    message: 'Recipe removed from favorites',
   });
 };
