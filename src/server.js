@@ -33,13 +33,6 @@ app.use(
 );
 app.use(cookieParser());
 
-app.use((req, _res, next) => {
-  if (req.url.startsWith('//api')) {
-    req.url = req.url.replace('//api', '/api');
-  }
-  next();
-});
-
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', recipesRoutes);

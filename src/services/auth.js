@@ -17,11 +17,12 @@ export const createSession = async (userId) => {
 };
 
 const cookieOptions = {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
-    path: '/',
-  };
+  domain: isProd ? '.onrender.com' : 'localhost',
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? 'none' : 'lax',
+  path: '/',
+};
 
 export const setSessionCookies = (res, session) => {
   res.cookie('accessToken', session.accessToken, {
