@@ -27,36 +27,15 @@ export const setSessionCookies = (res, session) => {
   res.cookie('accessToken', session.accessToken, {
     ...cookieOptions,
     maxAge: FIFTEEN_MINUTES,
-    domain: isProd ? 'taste-of-the-end-f.onrender.com' : 'localhost',
   });
 
   res.cookie('refreshToken', session.refreshToken, {
     ...cookieOptions,
     maxAge: ONE_DAY,
-    domain: isProd ? 'taste-of-the-end-f.onrender.com' : 'localhost',
   });
 
   res.cookie('sessionId', session._id, {
     ...cookieOptions,
     maxAge: ONE_DAY,
-    domain: isProd ? 'taste-of-the-end-f.onrender.com' : 'localhost',
-  });
-
-  res.cookie('accessToken', session.accessToken, {
-    ...cookieOptions,
-    maxAge: FIFTEEN_MINUTES,
-    domain: isProd ? 'taste-of-the-end-b.onrender.com' : 'localhost',
-  });
-
-  res.cookie('refreshToken', session.refreshToken, {
-    ...cookieOptions,
-    maxAge: ONE_DAY,
-    domain: isProd ? 'taste-of-the-end-b.onrender.com' : 'localhost',
-  });
-
-  res.cookie('sessionId', session._id, {
-    ...cookieOptions,
-    maxAge: ONE_DAY,
-    domain: isProd ? 'taste-of-the-end-b.onrender.com' : 'localhost',
   });
 };
