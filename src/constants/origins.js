@@ -1,4 +1,7 @@
-export const PROD_ORIGINS = ['https://taste-of-the-end-f.onrender.com'];
+export const PROD_ORIGINS = [
+  'https://taste-of-the-end-f.onrender.com',
+  'https://taste-of-the-end-f.vercel.app',
+];
 export const DEV_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
 
 export const getAllowedOrigins = (isProd) =>
