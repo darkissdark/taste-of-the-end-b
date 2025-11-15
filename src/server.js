@@ -14,20 +14,30 @@ import userRoutes from './routes/userRoutes.js';
 import recipesRoutes from './routes/recipesRoutes.js';
 import categoriesRoutes from './routes/categoryRoutes.js';
 import ingredientsRoutes from './routes/ingredients.js';
+import { getAllowedOrigins } from './constants/origins.js';
+import { isProd } from './constants/env.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3030;
+const allowedOrigins = getAllowedOrigins(isProd);
 
 app.use(logger);
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  }),
+);
 app.use(cookieParser());
 
-app.use(authRoutes);
-app.use(userRoutes);
-app.use(recipesRoutes);
-app.use(categoriesRoutes);
-app.use(ingredientsRoutes);
+app.use('/api', authRoutes);
+app.use('/api', userRoutes);
+app.use('/api', recipesRoutes);
+app.use('/api', categoriesRoutes);
+app.use('/api', ingredientsRoutes);
 
 app.use(notFoundHandler);
 
@@ -39,4 +49,7 @@ await connectMongoDB();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(
+    isProd ? 'Running in production mode' : 'Running in development mode',
+  );
 });
