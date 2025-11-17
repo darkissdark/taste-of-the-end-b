@@ -16,6 +16,7 @@ import categoriesRoutes from './routes/categoryRoutes.js';
 import ingredientsRoutes from './routes/ingredients.js';
 import { getAllowedOrigins } from './constants/origins.js';
 import { isProd } from './constants/env.js';
+import { swaggerDocs } from '../swagger.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3030;
@@ -38,6 +39,7 @@ app.use('/api', userRoutes);
 app.use('/api', recipesRoutes);
 app.use('/api', categoriesRoutes);
 app.use('/api', ingredientsRoutes);
+swaggerDocs(app);
 
 app.use(notFoundHandler);
 

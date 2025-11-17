@@ -178,7 +178,7 @@ export const createRecipe = async (req, res) => {
   });
 };
 export const getPersonalRecipes = async (req, res) => {
-  const userId = req.user._id; // приходить з auth middleware
+  const userId = req.user._id;
 
   const recipes = await Recipe.find({ owner: userId }).populate(
     'ingredients.id',
