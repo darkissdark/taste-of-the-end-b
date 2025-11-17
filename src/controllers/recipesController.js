@@ -124,7 +124,13 @@ export const getRecipeById = async (req, res, next) => {
 export const createRecipe = async (req, res) => {
   const { title, description, time, calories, instructions, category } =
     req.body;
-  const { url } = await saveFileToCloudinary(req.file.buffer);
+
+  let url =
+    'https://res.cloudinary.com/dcfruowkp/image/upload/v1762504133/cld-sample-4.jpg';
+  if (req.file) {
+    const upload = await saveFileToCloudinary(req.file.buffer);
+    url = upload.url;
+  }
 
   const categoryExists = await Category.exists({ name: category });
   if (!categoryExists) {
