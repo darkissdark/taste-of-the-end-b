@@ -219,14 +219,24 @@ export const addToFavorites = async (req, res) => {
 export const getFavorites = async (req, res) => {
   const userId = req.user._id;
 
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // 1. Отримуємо юзера, але не всі фаворити — тільки потрібний шматок
   const user = await User.findById(userId).populate({
     path: 'favorites',
+    options: { skip, limit }, // пагінація тут!
     populate: {
       path: 'ingredients.id',
       select: 'name desc img',
     },
   });
 
+  // 2. Загальна кількість favorites
+  const totalFavorites = user.favorites.length;
+
+  // 3. Приводимо результати до потрібного формату
   const favorites = user.favorites.map((recipe) => {
     const obj = recipe.toObject();
 
@@ -241,7 +251,14 @@ export const getFavorites = async (req, res) => {
     };
   });
 
-  res.status(200).json(favorites);
+  // 4. Відповідь з пагінацією
+  res.status(200).json({
+    total: totalFavorites,
+    page,
+    limit,
+    totalPages: Math.ceil(totalFavorites / limit),
+    data: favorites,
+  });
 };
 
 export const removeFromFavorites = async (req, res, next) => {
