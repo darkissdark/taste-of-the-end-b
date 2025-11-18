@@ -220,13 +220,13 @@ export const getFavorites = async (req, res) => {
   const userId = req.user._id;
 
   const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  const perPage = Number(req.query.limit) || 10;
+  const skip = (page - 1) * perPage;
 
   // 1. Отримуємо юзера, але не всі фаворити — тільки потрібний шматок
   const user = await User.findById(userId).populate({
     path: 'favorites',
-    options: { skip, limit }, // пагінація тут!
+    options: { skip, perPage }, // пагінація тут!
     populate: {
       path: 'ingredients.id',
       select: 'name desc img',
@@ -255,8 +255,8 @@ export const getFavorites = async (req, res) => {
   res.status(200).json({
     total: totalFavorites,
     page,
-    limit,
-    totalPages: Math.ceil(totalFavorites / limit),
+    perPage,
+    totalPages: Math.ceil(totalFavorites / perPage),
     data: favorites,
   });
 };
