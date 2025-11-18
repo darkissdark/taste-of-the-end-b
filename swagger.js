@@ -79,6 +79,10 @@ const options = {
                         example: '2025-11-11T18:33:45.468Z',
                       },
                       name: { type: 'string', example: 'Yurii' },
+                      _id: {
+                        type: 'string',
+                        example: '691b0e8d3c9359ec050fbf8a',
+                      },
                     },
                   },
                 },
@@ -120,7 +124,6 @@ const options = {
           },
           responses: {
             200: {
-              description: 'User successfully logged in',
               content: {
                 'application/json': {
                   schema: {
@@ -143,6 +146,10 @@ const options = {
                         example: '2025-11-11T18:33:45.468Z',
                       },
                       name: { type: 'string', example: 'Yuri' },
+                      _id: {
+                        type: 'string',
+                        example: '691b0e8d3c9359ec050fbf8a',
+                      },
                     },
                   },
                 },
@@ -159,7 +166,8 @@ const options = {
           tags: ['Auth'],
           security: [{ cookieAuth: [] }],
           responses: {
-            204: { description: 'no-content' },
+            204: { description: '' },
+            401: { description: 'Missing or invalid token' },
           },
         },
       },
@@ -183,6 +191,7 @@ const options = {
                 },
               },
             },
+            401: { description: 'Missing or invalid token' },
           },
         },
       },
@@ -190,7 +199,37 @@ const options = {
         get: {
           summary: 'Get all categories',
           tags: ['Categories'],
-          responses: { 200: { description: 'List of categories' } },
+          responses: {
+            200: {
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                    example: [
+                      'Pork',
+                      'Lamb',
+                      'Starter',
+                      'Breakfast',
+                      'Seafood',
+                      'Pasta',
+                      'Chicken',
+                      'Dessert',
+                      'Vegan',
+                      'Soup',
+                      'Beef',
+                      'Miscellaneous',
+                      'Side',
+                      'Vegetarian',
+                      'Goat',
+                    ],
+                  },
+                },
+              },
+            },
+          },
         },
       },
       '/api/ingredients': {
