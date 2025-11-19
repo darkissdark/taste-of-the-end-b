@@ -208,12 +208,19 @@ export const addToFavorites = async (req, res) => {
   if (!recipeExists) {
     throw createHttpError(404, 'Recipe not found');
   }
+  const user = await User.findById(userId).select('favorites');
+  if (user.favorites.includes(recipeId)) {
+    throw createHttpError(400, 'Recipe already in favorites');
+  }
+  const updUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $addToSet: { favorites: recipeId },
+    },
+    { new: true },
+  );
 
-  await User.findByIdAndUpdate(userId, {
-    $addToSet: { favorites: recipeId },
-  });
-
-  res.json({ message: 'Added to favorites' });
+  res.status(200).json(updUser.favorites);
 };
 
 export const getFavorites = async (req, res) => {
@@ -274,7 +281,11 @@ export const removeFromFavorites = async (req, res, next) => {
     return next(createHttpError(404, 'Recipe not found'));
   }
 
-  await User.findByIdAndUpdate(
+  const user = await User.findById(userId).select('favorites');
+  if (!user.favorites.includes(recipeId)) {
+    return next(createHttpError(400, 'Recipe is not in favorites'));
+  }
+  const updUser = await User.findByIdAndUpdate(
     userId,
     {
       $pull: { favorites: recipeId },
@@ -282,7 +293,5 @@ export const removeFromFavorites = async (req, res, next) => {
     { new: true },
   );
 
-  res.status(200).json({
-    message: 'Recipe removed from favorites',
-  });
+  res.status(200).json(updUser.favorites);
 };
