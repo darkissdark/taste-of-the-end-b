@@ -26,5 +26,7 @@ export const getCurrentUser = async (req, res) => {
   if (!user) {
     return res.status(404).json({ message: 'User not found' });
   }
-  res.status(200).json(user);
+  const userObj = user.toJSON();
+  userObj.favorites = user.favorites;
+  res.status(200).json(userObj);
 };
