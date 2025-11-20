@@ -264,7 +264,7 @@ export const getFavorites = async (req, res) => {
     page,
     perPage,
     totalPages: Math.ceil(totalFavorites / perPage),
-    data: favorites,
+    recipes: favorites,
   });
 };
 
