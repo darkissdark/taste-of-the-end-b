@@ -67,7 +67,7 @@ export const logoutUser = async (req, res) => {
 export const refreshUserSession = async (req, res, next) => {
   const { sessionId, refreshToken } = req.cookies;
 
-  const clearAndRespondUnauthorized = () => {
+  const clearAndRespondUnauthorized = async () => {
     res.clearCookie('sessionId');
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
@@ -90,21 +90,15 @@ export const refreshUserSession = async (req, res, next) => {
   const isExpired = new Date() > new Date(session.refreshTokenValidUntil);
 
   if (isExpired) {
-    await Session.deleteOne({
-      _id: sessionId,
-      refreshToken: refreshToken,
-    });
+    await Session.deleteOne({ _id: sessionId });
     return clearAndRespondUnauthorized();
   }
-
-  await Session.deleteOne({
-    _id: sessionId,
-    refreshToken: refreshToken,
-  });
 
   const newSession = await createSession(session.userId);
 
   setSessionCookies(res, newSession);
+
+  await Session.deleteOne({ _id: sessionId });
 
   return res.status(200).json({
     authorized: true,
