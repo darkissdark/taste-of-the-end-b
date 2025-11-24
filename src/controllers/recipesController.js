@@ -186,12 +186,26 @@ export const createRecipe = async (req, res) => {
 export const getPersonalRecipes = async (req, res) => {
   const userId = req.user._id;
 
-  const recipes = await Recipe.find({ owner: userId }).populate(
-    'ingredients.id',
-    'name desc img',
-  );
+  // Отримуємо page і limit з query
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 12;
+  const skip = (page - 1) * limit;
+
+  // Загальна кількість рецептів користувача
+  const total = await Recipe.countDocuments({ owner: userId });
+
+  // Отримуємо рецепти з пагінацією
+  const recipes = await Recipe.find({ owner: userId })
+    .populate('ingredients.id', 'name desc img')
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 }); // опційно, щоб нові зверху
+
   res.status(200).json({
-    total: recipes.length,
+    total,
+    page,
+    perPage: limit,
+    totalPages: Math.ceil(total / limit),
     recipes,
   });
 };
@@ -227,26 +241,25 @@ export const getFavorites = async (req, res) => {
   const userId = req.user._id;
 
   const page = Number(req.query.page) || 1;
-  const perPage = Number(req.query.limit) || 10;
+  const perPage = Number(req.query.limit) || 12;
   const skip = (page - 1) * perPage;
 
-  // 1. Отримуємо юзера, але не всі фаворити — тільки потрібний шматок
+  // Отримуємо юзера з усіма favorites
   const user = await User.findById(userId).populate({
     path: 'favorites',
-    options: { skip, perPage }, // пагінація тут!
     populate: {
       path: 'ingredients.id',
       select: 'name desc img',
     },
   });
 
-  // 2. Загальна кількість favorites
   const totalFavorites = user.favorites.length;
 
-  // 3. Приводимо результати до потрібного формату
-  const favorites = user.favorites.map((recipe) => {
-    const obj = recipe.toObject();
+  // Використовуємо slice для пагінації
+  const favoritesPage = user.favorites.slice(skip, skip + perPage);
 
+  const favorites = favoritesPage.map((recipe) => {
+    const obj = recipe.toObject();
     return {
       ...obj,
       ingredients: obj.ingredients.map((i) => ({
@@ -258,7 +271,6 @@ export const getFavorites = async (req, res) => {
     };
   });
 
-  // 4. Відповідь з пагінацією
   res.status(200).json({
     total: totalFavorites,
     page,
